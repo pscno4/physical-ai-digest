@@ -1,0 +1,30 @@
+name: Physical AI 모닝 브리핑
+
+on:
+  schedule:
+    # 매일 오전 7시 KST = UTC 22:00 (전날)
+    - cron: "0 22 * * *"
+  workflow_dispatch:   # 수동 테스트용
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 의존성 설치
+        run: pip install anthropic feedparser requests
+
+      - name: 뉴스 수집 & 카카오톡 발송
+        env:
+          ANTHROPIC_API_KEY:  ${{ secrets.ANTHROPIC_API_KEY }}
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: python scripts/news_digest.py
